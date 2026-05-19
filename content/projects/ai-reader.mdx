@@ -1,0 +1,86 @@
+---
+title: "AI Reader"
+summary: "一个基于 Next.js 和 Electron 的本地 AI 阅读器，支持导入 PDF、EPUB、TXT，并围绕当前阅读上下文进行解释、翻译、问答和笔记整理。"
+role: "独立开发者 / 产品与工程"
+period: "2026 年持续迭代"
+type: "Desktop AI Reading Tool"
+problem: "阅读 PDF、EPUB、TXT 时，解释、翻译、问答和笔记经常分散在多个工具里，AI 也缺少当前阅读上下文。"
+outcome: "已完成多格式本地阅读、桌面端书库持久化、上下文 AI 助理、划词工具和 Markdown 笔记导出。"
+highlights:
+  - "把 Web 阅读器封装为 Electron 桌面应用，并把书籍文件与书库状态保存到系统 userData。"
+  - "分别处理 PDF、EPUB、TXT 的阅读体验，包括目录、进度恢复、主题和文本选择。"
+  - "让 AI 助理围绕当前页面和选中文本工作，而不是提供脱离场景的通用聊天框。"
+stack:
+  - "Next.js 16"
+  - "React 19"
+  - "Electron"
+  - "Tailwind CSS v4"
+  - "react-pdf"
+  - "epubjs"
+  - "localforage"
+status: "桌面版开发中"
+date: "2026-05-19"
+links: {}
+featured: true
+---
+
+## Overview
+
+AI Reader 是我围绕“AI 如何真正进入阅读流程”做的主项目。它不是一个只接入聊天 API 的 Demo，而是一个本地阅读器：用户可以导入 PDF、EPUB、TXT，在阅读时直接解释、翻译、提问和整理笔记。
+
+我在这个项目里同时负责产品定义、界面实现、阅读器能力、桌面端持久化和 AI 配置流程。
+
+## Problem
+
+阅读长文档时，真正影响效率的不是“有没有 AI”，而是 AI 能不能理解用户正在读什么。常见流程里，阅读器、翻译工具、聊天窗口和笔记工具彼此分离，用户需要复制内容、切换窗口、再手动整理结果。
+
+AI Reader 想解决的是这个断裂：让解释、翻译、问答和笔记都围绕当前阅读上下文发生。
+
+## Users / Context
+
+第一版面向需要高频阅读长文档的人：学生、开发者、自学者，或者任何需要读教材、论文、电子书和技术文档的人。这个场景对稳定性要求很高，因为阅读进度、文件、笔记和偏好都不能轻易丢失。
+
+## What I Built
+
+- 本地图书馆：导入、删除、搜索 PDF / EPUB / TXT。
+- 桌面持久化：Electron 版本把书籍文件和书库状态写入系统 `userData`，避免大文件长期依赖浏览器 IndexedDB。
+- PDF 阅读：页码跳转、缩放、目录跳转、阅读进度恢复、选中文本解释/翻译。
+- EPUB 阅读：目录、分页阅读、主题色、字号、多字体、词间距、阅读位置恢复。
+- TXT 阅读：纯文本阅读、主题和字号设置。
+- AI 助理：基于当前页面内容问答，支持云端 OpenAI-compatible API 和本地 Ollama-compatible API。
+- 划词工具：选中文本后可翻译、解释、添加笔记。
+- 图书笔记：保存摘录和想法，并支持导出 Markdown。
+
+## Key Technical Decisions
+
+### 1. 用 Electron 承担本地文件持久化
+
+项目使用 Next.js App Router 构建 Web UI，再通过 Electron 包装成桌面应用。Web 开发版会回退到 IndexedDB / localStorage，Electron 桌面版则通过主进程和 preload 把书籍文件、书库索引、笔记和阅读偏好保存到 `app.getPath("userData")`。
+
+这个边界很重要：浏览器存储适合快速验证，但本地阅读器需要更稳定地管理大文件。Electron 版本把原始书籍文件放在 `books/`，把书库、笔记和偏好写入 `library/library.json`，让桌面体验更接近一个真实 App。
+
+### 2. 按格式拆分阅读体验
+
+PDF 阅读器关注页码、缩放、目录和文本选择；EPUB 阅读器关注 iframe 内部样式注入、主题、字体、词间距和 CFI 恢复；TXT 阅读器则优先保持纯文本阅读体验稳定。
+
+EPUB 是最容易出问题的部分。因为内容运行在 iframe 中，字号、字体、词距、主题都必须通过 `epubjs` 注入到 iframe 内部。调整 EPUB 容器宽度时还要保存当前 CFI，避免拖拽分栏宽度时阅读位置回退。
+
+### 3. 让 AI 绑定当前阅读上下文
+
+AI 助理支持云端 OpenAI-compatible API 和本地 Ollama-compatible API。相比单独的聊天窗口，我更关注它能不能拿到当前页面内容、选中文本和用户正在阅读的位置。
+
+## Result So Far
+
+项目目前已经支持 PDF / EPUB / TXT 的本地阅读流程，Electron 桌面版可以持久化书库状态，用户可以围绕当前页面内容提问、划词解释/翻译，并把摘录和想法导出为 Markdown。
+
+这些结果还不是用户量或商业指标，但它们证明了一个完整产品原型的核心路径：导入书籍、阅读、调用 AI、沉淀笔记、恢复状态。
+
+## What I Learned
+
+这个项目让我更清楚地意识到，AI 功能不是把一个聊天框放进页面就结束。真正有用的 AI 工具需要理解用户正在做什么，并把上下文、数据边界、失败状态和长期使用体验一起设计好。
+
+我也学到，阅读器这种产品的难点往往藏在细节里：EPUB iframe 样式注入、拖拽宽度后的 CFI 恢复、文件存储位置、阅读进度同步、不同格式的交互差异，都会直接影响用户是否愿意长期使用。
+
+## Next Steps
+
+下一步我会继续完善阅读器 UI、AI 配置体验和笔记导出流程，并补充更多真实阅读场景下的验证记录。
