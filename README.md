@@ -1,4 +1,4 @@
-# Personal Website
+# my_website
 
 中文为主的个人作品集和博客网站，用于展示 AI Reader 等项目，并服务未来实习申请。
 
