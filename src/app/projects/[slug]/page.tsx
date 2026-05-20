@@ -88,6 +88,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <a
                     key={label}
                     href={href}
+                    target="_blank"
+                    rel="noreferrer"
                     className="inline-flex min-h-11 items-center rounded-md border border-slate-700 px-4 text-sm font-semibold text-slate-300 transition hover:border-emerald-300 hover:text-emerald-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-300"
                   >
                     {label}

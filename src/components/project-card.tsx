@@ -11,6 +11,8 @@ type ProjectCardProps = {
 };
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const linkEntries = Object.entries(project.links).filter(([, href]) => href);
+
   return (
     <article className="group overflow-hidden rounded-lg border border-slate-800 bg-slate-900/45 transition hover:border-slate-700 hover:bg-slate-800/45">
       <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
@@ -62,12 +64,25 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <div className="mt-6">
             <TagList items={project.stack.slice(0, 6)} variant="dark" />
           </div>
-          <Link
-            href={`/projects/${project.slug}`}
-            className="mt-6 inline-flex min-h-11 items-center text-sm font-semibold text-emerald-300 transition hover:text-emerald-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-300"
-          >
-            阅读完整案例
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <Link
+              href={`/projects/${project.slug}`}
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-emerald-300 transition hover:text-emerald-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-300"
+            >
+              阅读完整案例
+            </Link>
+            {linkEntries.map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-300 transition hover:text-emerald-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-300"
+              >
+                打开 {label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </article>
