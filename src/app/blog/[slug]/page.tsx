@@ -54,6 +54,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <p className="mt-6 text-lg leading-8 text-slate-400">{post.description}</p>
         <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-500">
           <time dateTime={post.date}>{formatDate(post.date)}</time>
+          <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
+            {post.category}
+          </span>
         </div>
         <ul className="mt-6 flex flex-wrap gap-2" aria-label="文章标签">
           {post.tags.map((tag) => (

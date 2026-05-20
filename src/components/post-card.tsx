@@ -8,9 +8,14 @@ type PostCardProps = {
 export function PostCard({ post }: PostCardProps) {
   return (
     <article className="rounded-lg border border-slate-800 bg-slate-900/45 p-5 transition hover:border-slate-700 hover:bg-slate-800/45">
-      <time className="text-sm text-slate-500" dateTime={post.date}>
-        {formatDate(post.date)}
-      </time>
+      <div className="flex flex-wrap items-center gap-3">
+        <time className="text-sm text-slate-500" dateTime={post.date}>
+          {formatDate(post.date)}
+        </time>
+        <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
+          {post.category}
+        </span>
+      </div>
       <h2 className="mt-3 text-xl font-bold leading-tight tracking-normal text-slate-100">
         <Link
           href={`/blog/${post.slug}`}

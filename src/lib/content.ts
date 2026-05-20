@@ -26,6 +26,7 @@ export type BlogFrontmatter = {
   title: string;
   description: string;
   date: string;
+  category: BlogCategory;
   tags: string[];
 };
 
@@ -33,6 +34,31 @@ export type ContentEntry<T extends { date: string }> = T & {
   slug: string;
   content: string;
 };
+
+export const blogCategories = [
+  {
+    key: "just-for-fun",
+    label: "闲谈（just for fun）",
+    description: "随手记录生活、想法和不一定严肃的观察。",
+  },
+  {
+    key: "technical-thinking",
+    label: "技术思考",
+    description: "关于工程取舍、产品判断和技术路线的思考。",
+  },
+  {
+    key: "study-notes",
+    label: "学习笔记",
+    description: "整理课程、自学资料和阶段性知识沉淀。",
+  },
+  {
+    key: "project-problems",
+    label: "项目中的问题",
+    description: "记录做项目时遇到的具体问题、定位过程和解决方案。",
+  },
+] as const;
+
+export type BlogCategory = (typeof blogCategories)[number]["label"];
 
 function assertString(value: unknown, field: string): asserts value is string {
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -42,6 +68,15 @@ function assertString(value: unknown, field: string): asserts value is string {
 
 function assertStringArray(value: unknown, field: string): asserts value is string[] {
   if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+    throw new Error(`Missing or invalid frontmatter field: ${field}`);
+  }
+}
+
+function assertBlogCategory(value: unknown, field: string): asserts value is BlogCategory {
+  if (
+    typeof value !== "string" ||
+    !blogCategories.some((category) => category.label === value)
+  ) {
     throw new Error(`Missing or invalid frontmatter field: ${field}`);
   }
 }
@@ -124,12 +159,14 @@ function validateBlog(data: Record<string, unknown>, slug: string): BlogFrontmat
   assertString(data.title, `blog/${slug}.title`);
   assertString(data.description, `blog/${slug}.description`);
   assertString(data.date, `blog/${slug}.date`);
+  assertBlogCategory(data.category, `blog/${slug}.category`);
   assertStringArray(data.tags, `blog/${slug}.tags`);
 
   return {
     title: data.title,
     description: data.description,
     date: data.date,
+    category: data.category,
     tags: data.tags,
   };
 }
